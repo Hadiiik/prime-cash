@@ -7,6 +7,7 @@
     <link rel="icon" type="image/x-icon" href="1773383981148.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="global.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4F46E5">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -600,7 +601,7 @@
                 <div class="logo-icon">
                     <i class="fas fa-gem"></i>
                 </div>
-                <div class="logo-text">نقاطي</div>
+                <div class="logo-text">PrimeCash</div>
                 <div class="logo-sub">انضم إلينا وابدأ بجمع النقاط</div>
             </div>
 
@@ -819,7 +820,7 @@
                 const activityLog = [];
                 activityLog.unshift({
                     type: 'welcome',
-                    title: 'مرحباً بك في نقاطي!',
+                    title: 'مرحباً بك في PrimeCash!',
                     points: 0,
                     time: 'الآن',
                     timestamp: Date.now()
@@ -830,7 +831,7 @@
                 console.log('Account created successfully!');
                 
                 // التوجيه إلى الصفحة الرئيسية
-                window.location.href = 'index.html';
+                window.location.href = '/';
                 
             } catch (error) {
                 console.error('Error creating account:', error);
@@ -871,6 +872,74 @@
 
         // رسالة ترحيب في الكونسول (للتصحيح)
         console.log('Signup page loaded successfully');
+
+
+        (function() {
+            // منع Pull to Refresh على الموبايل
+            let touchStartY = 0;
+            let touchStartX = 0;
+            
+            // دالة بدء اللمس
+            const onTouchStart = function(e) {
+                touchStartY = e.touches[0].clientY;
+                touchStartX = e.touches[0].clientX;
+            };
+            
+            // دالة حركة اللمس
+            const onTouchMove = function(e) {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const touchY = e.touches[0].clientY;
+                const touchX = e.touches[0].clientX;
+                
+                // حساب اتجاه السحب
+                const deltaY = touchY - touchStartY;
+                const deltaX = Math.abs(touchX - touchStartX);
+                
+                // تحديد إذا كان السحب عمودي وليس أفقي
+                const isVerticalSwipe = Math.abs(deltaY) > deltaX;
+                
+                // منع Pull to Refresh فقط عندما:
+                // 1. المستخدم يسحب للأسفل (deltaY > 0)
+                // 2. الصفحة في الأعلى (scrollTop === 0)
+                // 3. السحب عمودي
+                if (isVerticalSwipe && scrollTop === 0 && deltaY > 0) {
+                    e.preventDefault();
+                    return false;
+                }
+            };
+            
+            // منع السحب الزائد (overscroll) عند استخدام الماوس
+            const preventOverscroll = function(e) {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                
+                // منع السحب للأسفل عند القمة
+                if (scrollTop === 0 && e.deltaY < 0) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // منع السحب للأعلى عند القاع (اختياري)
+                const scrollHeight = document.documentElement.scrollHeight;
+                const clientHeight = window.innerHeight;
+                const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+                
+                if (isAtBottom && e.deltaY > 0) {
+                    e.preventDefault();
+                    return false;
+                }
+            };
+            
+            // إضافة مستمعي الأحداث
+            document.addEventListener('touchstart', onTouchStart, { passive: false });
+            document.addEventListener('touchmove', onTouchMove, { passive: false });
+            window.addEventListener('wheel', preventOverscroll, { passive: false });
+            
+            // إضافة CSS إضافي لمنع السلوك الافتراضي
+            document.body.style.overscrollBehavior = 'none';
+            document.documentElement.style.overscrollBehavior = 'none';
+            
+            console.log('تم تفعيل منع Pull to Refresh');
+        })();
     </script>
 </body>
 </html>
