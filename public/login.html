@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PrimeCash - إنشاء حساب</title>
+    <link rel="icon" type="image/x-icon" href="1773383981148.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* نفس الألوان والمتغيرات من التطبيق الأصلي */
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #10B981;
+            --secondary-dark: #059669;
+            --background: #F9FAFB;
+            --card: #FFFFFF;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --border: #E5E7EB;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        .dark-theme {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #34D399;
+            --secondary-dark: #10B981;
+            --background: #111827;
+            --card: #1F2937;
+            --text: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --border: #374151;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            transition: var(--transition);
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* خلفية متحركة خفيفة */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.03) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* بطاقة التسجيل */
+        .signup-card {
+            background-color: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            width: 100%;
+        }
+
+        /* الزخرفة العلوية */
+        .signup-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0.1;
+            border-radius: 0 0 0 100%;
+            z-index: 0;
+        }
+
+        /* اللوقو */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: var(--shadow-lg);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .logo-icon i {
+            font-size: 3rem;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .logo-sub {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* عنوان النموذج */
+        .form-title {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-title h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .form-title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* حقول النموذج */
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .form-group i {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 50px 16px 16px;
+            background-color: var(--background);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+            display: block;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-input:focus + i {
+            color: var(--primary);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* مجموعة اختيار الجنس */
+        .gender-group {
+            margin-bottom: 25px;
+            z-index: 1;
+            position: relative;
+            width: 100%;
+        }
+
+        .gender-label {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .gender-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .gender-option input[type="radio"] {
+            display: none;
+        }
+
+        .gender-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px;
+            background-color: var(--background);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            text-align: center;
+        }
+
+        .gender-option label i {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .gender-option input[type="radio"]:checked + label {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .gender-option input[type="radio"]:checked + label i {
+            color: white;
+        }
+
+        .gender-option label:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* زر إنشاء الحساب */
+        .signup-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 800;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            box-shadow: var(--shadow);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            margin-top: 15px;
+            display: block;
+        }
+
+        .signup-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+            z-index: -1;
+        }
+
+        .signup-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .signup-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .signup-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .signup-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: linear-gradient(135deg, var(--text-secondary), var(--border));
+        }
+
+        /* حالة التحميل */
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* رابط تسجيل الدخول (للمستخدمين الحاليين) */
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .login-link a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            display: inline-block;
+        }
+
+        .login-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .login-link a:hover::after {
+            width: 100%;
+        }
+
+        /* شروط الاستخدام */
+        .terms {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            z-index: 1;
+            position: relative;
+        }
+
+        .terms a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* رسالة الخطأ */
+        .error-message {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            padding: 12px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-right: 4px solid var(--error);
+            animation: shake 0.5s ease;
+            width: 100%;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-message i {
+            font-size: 1.2rem;
+        }
+
+        /* تذكير بأن جميع الحقول مطلوبة */
+        .required-note {
+            text-align: left;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            width: 100%;
+        }
+
+        .required-note i {
+            color: var(--error);
+            font-size: 0.7rem;
+        }
+
+        /* نجاح التحقق من الحقل */
+        .form-input.valid {
+            border-color: var(--success);
+        }
+
+        .form-input.valid + i {
+            color: var(--success);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+                align-items: flex-start;
+                padding-top: 30px;
+            }
+
+            .container {
+                margin: 0 auto;
+            }
+
+            .signup-card {
+                padding: 30px 20px;
+            }
+
+            .logo-icon {
+                width: 70px;
+                height: 70px;
+            }
+
+            .logo-icon i {
+                font-size: 2.5rem;
+            }
+
+            .logo-text {
+                font-size: 1.8rem;
+            }
+
+            .form-title h2 {
+                font-size: 1.5rem;
+            }
+
+            .gender-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .signup-btn {
+                padding: 16px;
+                font-size: 1.1rem;
+            }
+
+            .gender-option label {
+                padding: 12px;
+            }
+        }
+
+        /* للشاشات الصغيرة جداً */
+        @media (max-width: 360px) {
+            body {
+                padding: 10px;
+            }
+
+            .signup-card {
+                padding: 20px 15px;
+            }
+
+            .logo-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .logo-icon i {
+                font-size: 2rem;
+            }
+
+            .logo-text {
+                font-size: 1.5rem;
+            }
+
+            .form-title h2 {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* للشاشات المتوسطة */
+        @media (min-width: 481px) and (max-width: 768px) {
+            body {
+                padding: 30px;
+            }
+
+            .container {
+                max-width: 450px;
+            }
+        }
+
+        /* للشاشات الكبيرة */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 550px;
+            }
+
+            .signup-card {
+                padding: 50px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="signup-card">
+            <!-- اللوقو -->
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <div class="logo-text">نقاطي</div>
+                <div class="logo-sub">انضم إلينا وابدأ بجمع النقاط</div>
+            </div>
+
+            <!-- عنوان النموذج -->
+            <div class="form-title">
+                <h2>إنشاء حساب جديد</h2>
+                <p>أدخل معلوماتك للتسجيل في التطبيق</p>
+            </div>
+
+            <!-- رسالة الخطأ (تظهر فقط عند وجود خطأ) -->
+            <div id="errorContainer" class="error-message" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorText">يرجى تعبئة جميع الحقول بشكل صحيح</span>
+            </div>
+
+            <!-- تذكير بأن جميع الحقول مطلوبة -->
+            <div class="required-note">
+                <i class="fas fa-asterisk"></i>
+                <span>جميع الحقول مطلوبة</span>
+            </div>
+
+            <!-- نموذج التسجيل -->
+            <form id="signupForm" novalidate>
+                <!-- حقل الاسم -->
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" class="form-input" id="fullName" name="fullName" placeholder="الاسم الكامل" autocomplete="name" required>
+                </div>
+
+                <!-- حقل البريد الإلكتروني -->
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" class="form-input" id="email" name="email" placeholder="البريد الإلكتروني" autocomplete="email" required>
+                </div>
+
+                <!-- اختيار الجنس -->
+                <div class="gender-group">
+                    <div class="gender-label">الجنس</div>
+                    <div class="gender-options">
+                        <div class="gender-option">
+                            <input type="radio" name="gender" id="male" value="male" checked>
+                            <label for="male">
+                                <i class="fas fa-mars"></i>
+                                ذكر
+                            </label>
+                        </div>
+                        <div class="gender-option">
+                            <input type="radio" name="gender" id="female" value="female">
+                            <label for="female">
+                                <i class="fas fa-venus"></i>
+                                أنثى
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- زر إنشاء الحساب -->
+                <button type="submit" class="signup-btn" id="signupBtn">
+                    <span id="btnText">إنشاء الحساب</span>
+                </button>
+            </form>
+
+            <!-- رابط تسجيل الدخول للمستخدمين الحاليين -->
+            <div class="login-link">
+                لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
+            </div>
+
+            <!-- شروط الاستخدام -->
+            <div class="terms">
+                بالتسجيل، أنت توافق على <a href="#">شروط الاستخدام</a> و <a href="#">سياسة الخصوصية</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // بيانات المستخدم الافتراضية
+        const defaultUserData = {
+            points: 0,
+            totalEarned: 0,
+            theme: 'light',
+            watchedVideos: [],
+            purchases: [],
+            withdrawals: [],
+            consecutiveDays: 1,
+            lastActivity: new Date().toDateString(),
+            isLoggedIn: true
+        };
+
+        // التحقق من صحة البريد الإلكتروني
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // التحقق من صحة الاسم (ليس فارغاً وطوله مناسب)
+        function isValidName(name) {
+            return name && name.trim().length >= 3;
+        }
+
+        // عرض رسالة خطأ
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorContainer.style.display = 'flex';
+            
+            // إخفاء الخطأ بعد 5 ثوان
+            setTimeout(() => {
+                errorContainer.style.display = 'none';
+            }, 5000);
+        }
+
+        // إخفاء رسالة الخطأ
+        function hideError() {
+            document.getElementById('errorContainer').style.display = 'none';
+        }
+
+        // تفعيل حالة التحميل
+        function setLoading(isLoading) {
+            const signupBtn = document.getElementById('signupBtn');
+            const btnText = document.getElementById('btnText');
+            
+            if (isLoading) {
+                signupBtn.disabled = true;
+                btnText.innerHTML = '<span class="loading-state"><span class="loading-spinner"></span> جاري إنشاء الحساب...</span>';
+            } else {
+                signupBtn.disabled = false;
+                btnText.textContent = 'إنشاء الحساب';
+            }
+        }
+
+        // حفظ بيانات المستخدم في localStorage
+        function saveUserData(userInfo) {
+            localStorage.setItem("isFirstTime","true")
+            // إنشاء كائن المستخدم الكامل
+            const userData = {
+                ...defaultUserData,
+                userInfo: {
+                    name: userInfo.fullName,
+                    email: userInfo.email,
+                    gender: userInfo.gender,
+                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(userInfo.fullName[0])}&background=4F46E5&color=fff&size=128&bold=true&font-size=0.5`,
+                    createdAt: new Date().toISOString()
+                },
+                isLoggedIn: true
+            };
+
+            // حفظ في localStorage
+            localStorage.setItem('userData', JSON.stringify(userData));
+            localStorage.setItem('isLoggedIn', 'true');
+            
+            // يمكن إضافة بيانات إضافية للتتبع
+            localStorage.setItem('userEmail', userInfo.email);
+            localStorage.setItem('userName', userInfo.fullName);
+            
+            console.log('User data saved successfully:', userData);
+        }
+
+        // معالج تقديم النموذج
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // إخفاء أي أخطاء سابقة
+            hideError();
+            
+            // الحصول على قيم الحقول
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+
+            // التحقق من صحة المدخلات
+            if (!fullName || !email || !gender) {
+                showError('يرجى تعبئة جميع الحقول المطلوبة');
+                return;
+            }
+
+            if (!isValidName(fullName)) {
+                showError('الاسم يجب أن يتكون من 3 أحرف على الأقل');
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showError('البريد الإلكتروني غير صحيح');
+                return;
+            }
+
+            // التحقق من عدم وجود حساب بنفس البريد
+            const existingUserData = localStorage.getItem('userData');
+            if (existingUserData) {
+                try {
+                    const existingData = JSON.parse(existingUserData);
+                    if (existingData.userInfo && existingData.userInfo.email === email) {
+                        showError('هذا البريد الإلكتروني مسجل بالفعل');
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Error checking existing email');
+                }
+            }
+
+            // تفعيل حالة التحميل (تأخير وهمي)
+            setLoading(true);
+
+            try {
+                // محاكاة تأخير الشبكة/المعالجة (2-3 ثوان)
+                await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1000));
+                
+                // حفظ البيانات
+                saveUserData({
+                    fullName,
+                    email,
+                    gender
+                });
+
+                // إضافة نشاط ترحيبي
+                const activityLog = [];
+                activityLog.unshift({
+                    type: 'welcome',
+                    title: 'مرحباً بك في نقاطي!',
+                    points: 0,
+                    time: 'الآن',
+                    timestamp: Date.now()
+                });
+                localStorage.setItem('activityLog', JSON.stringify(activityLog));
+
+                // رسالة نجاح (اختياري)
+                console.log('Account created successfully!');
+                
+                // التوجيه إلى الصفحة الرئيسية
+                window.location.href = 'index.html';
+                
+            } catch (error) {
+                console.error('Error creating account:', error);
+                showError('حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة مرة أخرى.');
+                setLoading(false);
+            }
+        });
+
+        // إضافة تأثيرات بصرية عند كتابة النص
+        document.getElementById('fullName').addEventListener('input', function() {
+            if (this.value.trim().length >= 3) {
+                this.classList.add('valid');
+            } else {
+                this.classList.remove('valid');
+            }
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            if (isValidEmail(this.value.trim())) {
+                this.classList.add('valid');
+            } else {
+                this.classList.remove('valid');
+            }
+        });
+
+        // تحميل الثيم المحفوظ مسبقاً (إذا وجد)
+        try {
+            const savedData = localStorage.getItem('userData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                if (parsedData.theme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                }
+            }
+        } catch (e) {
+            console.log('Error loading theme');
+        }
+
+        // رسالة ترحيب في الكونسول (للتصحيح)
+        console.log('Signup page loaded successfully');
+    </script>
+</body>
+</html>

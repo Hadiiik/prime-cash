@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>prime cash</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .splash-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+        }
+
+        .splash-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* إخفاء عناصر التحكم في الفيديو */
+        .splash-video::-webkit-media-controls {
+            display: none !important;
+        }
+        
+        .splash-video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+        
+        .splash-video::-webkit-media-controls-panel {
+            display: none !important;
+        }
+        
+        .splash-video::-webkit-media-controls-play-button {
+            display: none !important;
+        }
+        
+        .splash-video::-webkit-media-controls-start-playback-button {
+            display: none !important;
+        }
+
+        /* طبقة شفافة فوق الفيديو لمنع أي تفاعل */
+        .splash-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2;
+            background-color: transparent;
+            cursor: default;
+        }
+
+        /* شاشة التحميل البسيطة */
+        .splash-loading {
+            position: absolute;
+            z-index: 3;
+            color: white;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.2rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #4F46E5;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* تذييل الشاشة */
+        .splash-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            z-index: 3;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.8rem;
+            pointer-events: none;
+        }
+
+        /* iframe مخفي للتحميل المسبق */
+        .preload-iframe {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .loading-text {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .spinner {
+                width: 40px;
+                height: 40px;
+                border-width: 4px;
+            }
+            
+            .loading-text {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* دعم الوضع الليلي حسب تفضيلات النظام */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #000;
+            }
+        }
+    </style>
+    <!-- إضافة خط Cairo للنصوص -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="splash-container">
+        <!-- عنصر الفيديو -->
+        <video class="splash-video" id="splashVideo" preload="auto" muted playsinline disablePictureInPicture>
+            <source src="splash.mp4" type="video/mp4">
+        </video>
+        
+        <!-- طبقة شفافة لمنع التفاعل مع الفيديو -->
+        <div class="splash-overlay"></div>
+        
+        <!-- شاشة التحميل البسيطة -->
+        <div class="splash-loading" id="splashLoading">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">جار التحميل...</div>
+        </div>
+        
+        <!-- تذييل الشاشة -->
+        <div class="splash-footer">
+            <span>prime caash</span>
+        </div>
+    </div>
+
+    <!-- iframe مخفي للتحميل المسبق -->
+    <iframe class="preload-iframe" id="preloadIframe"></iframe>
+
+    <script>
+        // التحقق من حالة تسجيل الدخول - بسيط جداً
+        function checkUserAuthentication() {
+            try {
+                // فقط ننظر إذا كان هناك قيمة true في localStorage
+                const isLoggedIn = localStorage.getItem('isLoggedIn');
+                return isLoggedIn === 'true';
+            } catch (e) {
+                console.error('Error checking login status:', e);
+                return false;
+            }
+        }
+
+        // تحديد الصفحة المستهدفة
+        function getTargetPage() {
+            return checkUserAuthentication() ? 'template.html' : 'login.html';
+        }
+
+        // تحميل الصفحة مسبقاً في الخلفية
+        function preloadPage(pageUrl) {
+            console.log('Preloading page:', pageUrl);
+            
+            const iframe = document.getElementById('preloadIframe');
+            iframe.src = pageUrl;
+            
+            // مراقبة تحميل iframe
+            iframe.onload = function() {
+                console.log('Page preloaded successfully:', pageUrl);
+                document.getElementById('loadingText').textContent = 'جاهز للتشغيل...';
+            };
+            
+            iframe.onerror = function() {
+                console.log('Error preloading page:', pageUrl);
+                // في حالة خطأ، نستمر بدون تحميل مسبق
+            };
+            
+            // استخدام link preload أيضاً (طريقة إضافية)
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = pageUrl;
+            link.as = 'document';
+            document.head.appendChild(link);
+            
+            // استخدام fetch للتحميل المسبق (طريقة احتياطية)
+            try {
+                fetch(pageUrl, { 
+                    method: 'GET',
+                    mode: 'no-cors',
+                    cache: 'force-cache'
+                }).catch(e => console.log('Fetch preload not critical:', e));
+            } catch (e) {
+                console.log('Fetch preload error (ignored):', e);
+            }
+        }
+
+        // توجيه المستخدم بناءً على حالة المصادقة - مع تحسين السرعة
+        function redirectUser() {
+            const targetPage = getTargetPage();
+            const cacheBuster = new Date().getTime();
+            window.location.href = targetPage + '?v=' + cacheBuster;
+            console.log('Redirecting to:', targetPage);
+            
+            // تغيير النص للإشارة إلى أننا ننتقل الآن
+            document.getElementById('loadingText').textContent = 'جاري الانتقال...';
+            
+            // التوجيه المباشر (سريع جداً الآن لأن الصفحة محملة مسبقاً)
+            window.location.href = targetPage;
+        }
+
+        // الحصول على عناصر الصفحة
+        const splashVideo = document.getElementById('splashVideo');
+        const splashLoading = document.getElementById('splashLoading');
+
+        // متغيرات التحكم
+        let videoTimeout = null;
+        let preloadStarted = false;
+
+        // عند تحميل الفيديو بنجاح
+        splashVideo.addEventListener('loadedmetadata', function() {
+            console.log('Video loaded, duration:', this.duration);
+            // إخفاء التحميل بعد ثانية من بدء التشغيل
+            setTimeout(() => {
+                splashLoading.style.opacity = '0';
+            }, 1000);
+        });
+
+        // عند بدء التشغيل - نبدأ التحميل المسبق فوراً
+        splashVideo.addEventListener('playing', function() {
+            console.log('Video is playing, starting preload...');
+            
+            if (!preloadStarted) {
+                preloadStarted = true;
+                // نبدأ تحميل الصفحة المناسبة في الخلفية
+                const targetPage = getTargetPage();
+                preloadPage(targetPage);
+            }
+        });
+
+        // عند انتهاء الفيديو
+        splashVideo.addEventListener('ended', function() {
+            console.log('Video ended, redirecting...');
+            clearTimeout(videoTimeout);
+            
+            // تغيير النص وتحضير الانتقال
+            document.getElementById('loadingText').textContent = 'جاري الانتقال...';
+            
+            // تأخير بسيط جداً (100ms) فقط لضمان ظهور التأثير البصري
+            setTimeout(() => {
+                redirectUser();
+            }, 100);
+        });
+
+        // في حالة خطأ في تحميل الفيديو - نوجه المستخدم فوراً
+        splashVideo.addEventListener('error', function(e) {
+            console.error('Video error, redirecting immediately...', e);
+            clearTimeout(videoTimeout);
+            redirectUser();
+        });
+
+        // منع أي تفاعل مع الفيديو
+        splashVideo.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+
+        splashVideo.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+
+        splashVideo.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // بدء التشغيل عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            // نحدد الصفحة المستهدفة مسبقاً (بدون تحميل)
+            const targetPage = getTargetPage();
+            console.log('Target page identified:', targetPage);
+            
+            // محاولة تشغيل الفيديو
+            const playPromise = splashVideo.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    // إذا فشل التشغيل لأي سبب، نوجه المستخدم فوراً
+                    console.error('Play failed, redirecting immediately:', error);
+                    redirectUser();
+                });
+            }
+
+            // تايمر احتياطي - إذا استغرق الفيديو وقت طويل ولم ينته خلال 8 ثوان، نوجه المستخدم
+            videoTimeout = setTimeout(() => {
+                console.log('Safety timeout reached, redirecting...');
+                
+                // قبل التوجيه، نتحقق إذا كان التحميل المسبق قد بدأ
+                if (!preloadStarted) {
+                    const targetPage = getTargetPage();
+                    preloadPage(targetPage);
+                }
+                
+                redirectUser();
+            }, 8000); // 8 ثوان كحد أقصى
+
+            // بدأ التحميل المسبق فوراً (كإجراء احتياطي) بعد 2 ثانية حتى لو لم يبدأ الفيديو
+            setTimeout(() => {
+                if (!preloadStarted) {
+                    console.log('Starting preload as fallback');
+                    preloadStarted = true;
+                    const targetPage = getTargetPage();
+                    preloadPage(targetPage);
+                }
+            }, 2000);
+        });
+
+        // منع السحب للتحديث في المتصفحات المحمولة
+        document.body.addEventListener('touchmove', (e) => {
+            if (e.target === splashVideo || e.target === document.body) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        console.log('Splash screen initialized - with preloading');
+    </script>
+</body>
+</html>
