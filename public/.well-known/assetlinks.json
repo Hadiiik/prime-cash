@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.vercel.prime_cash.twa",
+    "sha256_cert_fingerprints": [
+      "8E:BD:73:B7:56:A4:C9:40:43:B0:EB:2D:4E:1A:06:34:B0:6D:6C:64:70:83:78:52:80:7A:D3:50:ED:C3:55:45"
+    ]
+  }
+}]
