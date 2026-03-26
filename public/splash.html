@@ -382,5 +382,12 @@
 
         console.log('Splash screen initialized - with preloading');
     </script>
+    <script>
+          
+          if (typeof navigator.serviceWorker !== 'undefined') {
+            navigator.serviceWorker.register('sw.js')
+          }
+        
+        </script>
 </body>
 </html>
